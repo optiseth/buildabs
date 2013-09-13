@@ -25,12 +25,14 @@ version() {
     exit 0
 }
 
-##
-# Signal Traps
-##
-#trap '"rm -r /tmp/$package"; exit 1' SIGTERM SIGHUP SIGQUIT
-#trap '"rm -r /tmp/$package"; exit 1' SIGINT
-#trap '"rm -r /tmp/$package"; exit 1' SIGERR
+updateabs() {
+    if [ ! -x "/usr/bin/sudo" ]; then
+	echo "Can't use the -u option without sudo privileges."
+	exit 1
+    else
+	sudo abs
+    fi
+}
 
 while : ; do
     case "$1" in
@@ -38,12 +40,8 @@ while : ; do
 	    usage
 	    ;;
 	-u)
-	    if [ ! -x "/usr/bin/sudo" ]; then
-		echo "Can't use the -u option without sudo privileges."
-		exit 1
-	    else
-		sudo abs
-	    fi
+	    updateabs
+	    read -t 1 -n 10000 discard 
 	    shift
 	    ;;
 	-v)
@@ -74,7 +72,7 @@ while : ; do
 	    exit 0
 	    shift 2
 	    ;;
-	?)
+	*)
 	    usage
 	    ;;
     esac
