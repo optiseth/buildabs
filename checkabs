@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 usage() {
+    echo
     echo "Usage: checkabs [options] PACKAGENAME"
     echo
     echo "Checks the ABS for a given package and attempts to upgrade from source."
@@ -15,6 +16,7 @@ usage() {
 }
 
 version() {
+    echo
     echo "checkabs-0.0.1 (abs v2.4.4/pacman v4.1.2)"
     echo "Copyright (c) 2013 Seth Sinquefield <s.sinquefield@gmail.com>."
     echo
@@ -22,6 +24,13 @@ version() {
     echo "There is NO WARRANTY, to the extent permitted by law."
     exit 0
 }
+
+##
+# Signal Traps
+##
+#trap '"rm -r /tmp/$package"; exit 1' SIGTERM SIGHUP SIGQUIT
+#trap '"rm -r /tmp/$package"; exit 1' SIGINT
+#trap '"rm -r /tmp/$package"; exit 1' SIGERR
 
 while : ; do
     case "$1" in
@@ -42,9 +51,7 @@ while : ; do
 	    shift
 	    ;;
 	-p)
-	    [ -n "${package}" ]
 	    package=$2
-	    echo
 	    packagepath=`find /var/abs/ -name $package`
 	    echo
 	    echo "Found $package at $packagepath"
@@ -56,7 +63,7 @@ while : ; do
 	    echo "$package release is $rel"
 	    echo
 
-	    read -p "Would you like to build the package from source?(Y/n) " isBuild
+	    read -p "Would you like to build the package from source? (Y/n) " isBuild
 	    if [[ ${isBuild,,} != "n" ]] ; then
 		cp -r $packagepath /tmp
 		cd /tmp/$package
