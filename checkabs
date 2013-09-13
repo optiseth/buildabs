@@ -1,0 +1,74 @@
+#!/usr/bin/bash
+
+usage() {
+    echo "Usage: checkabs [options] PACKAGENAME"
+    echo
+    echo "Checks the ABS for a given package and attempts to upgrade from source."
+    echo "It will install necessary dependancies and remove them after installation."
+    echo
+    echo "Options:"
+    echo "-v         show program's version and exit"
+    echo "-h         show this help message and exit"
+    echo "-u         update the ABS repo"
+    echo "-p         specify a package"
+    exit 0
+}
+
+version() {
+    echo "checkabs-0.0.1 (abs v2.4.4/pacman v4.1.2)"
+    echo "Copyright (c) 2013 Seth Sinquefield <s.sinquefield@gmail.com>."
+    echo
+    echo "This is free software; see the source for copying conditions."
+    echo "There is NO WARRANTY, to the extent permitted by law."
+    exit 0
+}
+
+while : ; do
+    case "$1" in
+	-h)
+	    usage
+	    ;;
+	-u)
+	    if [ ! -x "/usr/bin/sudo" ]; then
+		echo "Can't use the -u option without sudo privileges."
+		exit 1
+	    else
+		sudo abs
+	    fi
+	    shift
+	    ;;
+	-v)
+	    version
+	    shift
+	    ;;
+	-p)
+	    [ -n "${package}" ]
+	    package=$2
+	    echo
+	    packagepath=`find /var/abs/ -name $package`
+	    echo
+	    echo "Found $package at $packagepath"
+	    echo
+	    ver=`cat $packagepath/PKGBUILD | grep pkgver=`
+	    rel=`cat $packagepath/PKGBUILD | grep pkgrel=`
+	    
+	    echo "$package version is $ver"
+	    echo "$package release is $rel"
+	    echo
+
+	    read -p "Would you like to build the package from source?(Y/n) " isBuild
+	    if [[ ${isBuild,,} != "n" ]] ; then
+		cp -r $packagepath /tmp
+		cd /tmp/$package
+		makepkg -rsi
+		sudo rm -r /tmp/$package
+	    fi
+
+	    exit 0
+	    shift 2
+	    ;;
+	?)
+	    usage
+	    ;;
+    esac
+done
