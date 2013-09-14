@@ -16,6 +16,8 @@ packagepath=`find /var/abs/ -name $package`
 
 if [ -n $package ] && [ -n $packagepath ]; then
     echo "Found package at $packagepath"
+    info=`/usr/bin/pacman -Si $package | grep -i version`
+    echo "Current repo version is: $info"
     pkgver=`cat $packagepath/PKGBUILD | grep pkgver=`
     pkgrel=`cat $packagepath/PKGBUILD | grep pkgrel=`
     echo "Package version is $pkgver"
@@ -38,7 +40,7 @@ if [ -n $package ] && [ -n $packagepath ]; then
 	exit 1
     fi
 else
-    echo "Packge or packagepath is empty!"
+    echo "Package or packagepath is empty!"
     echo "Exiting now"
     exit 1
 fi
