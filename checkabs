@@ -17,7 +17,7 @@ packagepath=`find /var/abs/ -name $package`
 if [ -n $package ] && [ -n $packagepath ]; then
     echo "Found package at $packagepath"
     info=`/usr/bin/pacman -Si $package | grep -i version`
-    echo "Current repo version is: $info"
+    echo "Current repo version: $info"
     pkgver=`cat $packagepath/PKGBUILD | grep pkgver=`
     pkgrel=`cat $packagepath/PKGBUILD | grep pkgrel=`
     echo "Package version is $pkgver"
