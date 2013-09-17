@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import subprocess
 import sys
@@ -10,8 +10,8 @@ script, abs_package = sys.argv
 class checkABS:
     def __init__(self):
         self.package = abs_package
-        isUpdate = input("Would you like to update abs? (y/n) ")
-        if isUpdate.lower() == "y":
+        isUpdate = input("Would you like to update abs? (y/n) ").lower()
+        if isUpdate == "y":
             try:
                 print("\nUpdating ABS\n")
                 subprocess.call(["/usr/bin/sudo", "/usr/bin/abs"])
@@ -23,11 +23,10 @@ class checkABS:
             self.buildPackage()
             
     def buildPackage(self):
-        filePathByteEncoded = subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package])
-        filePath = bytes.decode(filePathByteEncoded.rstrip())
+        filePath = bytes.decode(subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package]).rstrip())
         
         try:
-            print("\nCopying", filePath, "to /tmp\n")
+            print("\nCopying", filePath, "to /tmp")
             subprocess.call(["/usr/bin/cp", "-r", filePath, "/tmp/"])
         except OSError:
             print("\nUnable to copy", filePath, "to /tmp\n")
