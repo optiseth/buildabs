@@ -10,6 +10,7 @@ script, abs_package = sys.argv
 class checkABS:
     def __init__(self):
         self.package = abs_package
+        editor = os.getenv('EDITOR')
         isUpdate = input("Would you like to update abs? (y/n) ").lower()
         if isUpdate == "y":
             try:
@@ -24,7 +25,9 @@ class checkABS:
             
     def buildPackage(self):
         filePath = bytes.decode(subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package]).rstrip())
-        
+        editor = os.getenv('EDITOR')
+        packageDir = "/tmp/" + self.package
+
         try:
             print("\nCopying", filePath, "to /tmp")
             subprocess.call(["/usr/bin/cp", "-r", filePath, "/tmp/"])
@@ -32,8 +35,11 @@ class checkABS:
             print("\nUnable to copy", filePath, "to /tmp\n")
             sys.exit(1)
 
+        editPKG = input("Would you like to edit the PKGBUILD? (y/n) ").lower()
+        if editPKG == 'y':
+            subprocess.call([editor, packageDir + "/PKGBUILD"])
+
         try:
-            packageDir = "/tmp/" + self.package
             os.chdir(packageDir)
         except OSError:
             print("\nCouldn't change to the copied directory:", packageDir)
