@@ -7,7 +7,7 @@ import shutil
 
 script, abs_package = sys.argv
 
-class checkABS:
+class buildABS:
     def __init__(self):
         self.package = abs_package
         editor = os.getenv('EDITOR')
@@ -59,4 +59,4 @@ class checkABS:
             print("\nCouldn't remove the build directory:", packageDir)
             sys.exit(1)
 
-checkABS()
+buildABS()
