@@ -27,36 +27,45 @@ class buildABS:
         filePath = bytes.decode(subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package]).rstrip())
         editor = os.getenv('EDITOR')
         packageDir = "/tmp/" + self.package
+        pkgver = bytes.decode(subprocess.check_output(["/usr/bin/grep", "pkgver=", filePath + "/PKGBUILD"]).rstrip())
+        pkgrel = bytes.decode(subprocess.check_output(["/usr/bin/grep", "pkgrel=", filePath + "/PKGBUILD"]).rstrip())
 
-        try:
-            print("\nCopying", filePath, "to /tmp")
-            subprocess.call(["/usr/bin/cp", "-r", filePath, "/tmp/"])
-        except OSError:
-            print("\nUnable to copy", filePath, "to /tmp\n")
-            sys.exit(1)
+        print("Package version:", pkgver)
+        print("Package release:", pkgrel)
+        doBuild = input("Would you still like to update? (y/n) ").lower()
+        
+        if doBuild == 'y':
+            try:
+                print("\nCopying", filePath, "to /tmp")
+                subprocess.call(["/usr/bin/cp", "-r", filePath, "/tmp/"])
+            except OSError:
+                print("\nUnable to copy", filePath, "to /tmp\n")
+                sys.exit(1)
 
-        editPKG = input("Would you like to edit the PKGBUILD? (y/n) ").lower()
-        if editPKG == 'y':
-            subprocess.call([editor, packageDir + "/PKGBUILD"])
+            editPKG = input("\nWould you like to edit the PKGBUILD? (y/n) ").lower()
+            if editPKG == 'y':
+                subprocess.call([editor, packageDir + "/PKGBUILD"])
+                
+            try:
+                os.chdir(packageDir)
+            except OSError:
+                print("\nCouldn't change to the copied directory:", packageDir)
+                sys.exit(1)
 
-        try:
-            os.chdir(packageDir)
-        except OSError:
-            print("\nCouldn't change to the copied directory:", packageDir)
-            sys.exit(1)
+            try:
+                print("\nBuilding the package now!\n")
+                subprocess.call(["makepkg", "-rsi"])
+            except OSError:
+                print("\nCouldn't makepkg")
+                sys.exit(1)
 
-        try:
-            print("\nBuilding the package now!\n")
-            subprocess.call(["makepkg", "-rsi"])
-        except OSError:
-            print("\nCouldn't makepkg")
-            sys.exit(1)
-
-        try:
-            print("\nRemoving build directory:", packageDir, "\n")
-            shutil.rmtree(packageDir)
-        except OSError:
-            print("\nCouldn't remove the build directory:", packageDir)
-            sys.exit(1)
-
+            try:
+                print("\nRemoving build directory:", packageDir, "\n")
+                shutil.rmtree(packageDir)
+            except OSError:
+                print("\nCouldn't remove the build directory:", packageDir)
+                sys.exit(1)
+        else:
+            print("\nExiting now!")
+            sys.exit
 buildABS()
