@@ -12,15 +12,32 @@ class buildABS:
             self.package = package
             self.packagePath = bytes.decode(subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package]).rstrip())
             self.continueBuild = ""
+            self.repoVersion = ""
 
+            self.repoInfo()
+            print("Repo Version:", self.repoVersion)
             self.absVersion()
             if self.continueBuild == 'y':
                   self.copyFromABS()
                   self.buildPackage()
-                  self.removeBuildDir()
+                  if self.checkInstall() == True:
+                        self.removeBuildDir()
+                  else:
+                        print(self.package, "failed to install. You can install manually.")
+                        sys.exit
             else:
                   sys.exit
-            
+
+      def repoInfo(self):
+            try:
+                  info = bytes.decode(subprocess.check_output(["/usr/bin/pacman", "-Si", self.package]).rstrip())
+                  info = info.split('\n')
+                  info= info[2].split(':')
+                  self.repoVersion = info[1].lstrip()
+                  return self.repoVersion
+            except FileNotFoundError:
+                  print("File not found.")
+                  sys.exit(1)
 
       def absVersion(self):
             try:
@@ -30,9 +47,9 @@ class buildABS:
                   print("ABS Release:", pkgrel)
                   self.continueBuild = input("\nWould you like to continue the build? (y/n) ").lower()
                   return self.continueBuild
-            except OSError as e:
-                  print(e.code)
-                  sys.exit
+            except FileNotFoundError:
+                  print("Can't find PKGBUILD / grep.")
+                  sys.exit(1)
 
       def copyFromABS(self):
             try:
@@ -40,7 +57,7 @@ class buildABS:
                   subprocess.call(["/usr/bin/cp", "-r", self.packagePath, "/tmp/"])
             except OSError as e:
                   print(e.code)
-                  sys.exit
+                  sys.exit(1)
 
       def buildPackage(self):
             try:
@@ -51,11 +68,11 @@ class buildABS:
                               subprocess.call([os.getenv('EDITOR'), "/tmp/" + self.package + "/PKGBUILD"])
                         except OSError as e:
                               print(e.code)
-                  print("\nBuilding the package now...")
+                  print("\nBuilding the package now...\n")
                   subprocess.call(["/usr/bin/makepkg", "-rsi"])
             except OSError as e:
                   print(e.code)
-                  sys.exit
+                  sys.exit(1)
       
       def removeBuildDir(self):
             try:
@@ -64,6 +81,19 @@ class buildABS:
             except OSError as e:
                   print(e.code)
                   print("\nMight require elevated privileges. You'll have to remove it manually.")
-                  sys.exit
+                  sys.exit(1)
+
+      def checkInstall(self):
+            try:
+                  isInstalled = bytes.decode(subprocess.check_output(["/usr/bin/pacman", "-Qi", self.package]).rstrip())
+                  isInstalled = isInstalled.split("\n")
+                  isInstalled = isInstalled[1].split(":")
+                  if isInstalled[1].lstrip() == self.repoVersion:
+                        return True
+                  else:
+                        return False
+            except FileNotFoundError:
+                  print("File not found")
+                  sys.exit(1)
 
 buildABS()
