@@ -10,9 +10,13 @@ script, package = sys.argv
 class buildABS:
       def __init__(self):
             self.package = package
-            self.packagePath = bytes.decode(subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package]).rstrip())
-            self.continueBuild = ""
-            self.repoVersion = ""
+            try:
+                  self.packagePath = bytes.decode(subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package]).rstrip())
+            except FileNotFoundError:
+                  print("Unable to find package in ABS repo. Try updating ABS first.")
+                  sys.exit(1)
+            self.continueBuild = None
+            self.repoVersion = None
 
             self.repoInfo()
             print("Repo Version:", self.repoVersion)
