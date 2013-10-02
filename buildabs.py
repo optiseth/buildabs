@@ -34,7 +34,7 @@ class buildABS:
             subprocess.call([os.getenv('EDITOR'), "/tmp/" + self.package + "/PKGBUILD"])
         except:
             print("\nFile not found")
-            print("Command: os.getevn('EDITOR') /tmp/" + self.package + "/PKGBUILD")
+            print("Command:", os.getevn('EDITOR'), "/tmp/" + self.package + "/PKGBUILD")
 
     def repoInfo(self):
         try:
