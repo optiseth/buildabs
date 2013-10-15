@@ -87,7 +87,7 @@ class buildABS:
             print("\nRemoving the build directory: /tmp/" + self.package + "\n")
             shutil.rmtree("/tmp/" + self.package)
         except:
-            print("\nAttempt to remove package directory failed: /tmp/" + self.package)
+            print("Attempt to remove package directory failed: /tmp/" + self.package)
             print("Might require elevated privileges. You'll have to remove it manually.")
             sys.exit(1)
 
