@@ -121,8 +121,6 @@ class ArgumentParser:
                 updateABS = True
             if self.args[index].lower() == '-e' or self.args[index].lower() == '--edit':
                 editPKGBUILD = True
-            #if self.args[index].lower() == '-h' or self.args[index].lower() == '--help':
-            #    usage()
 
         return
 
@@ -162,7 +160,7 @@ if __name__ == "__main__":
             sys.exit
     else:
         continueBuild = input("\nRepo version is newer than ABS version. Would you like to contine? (y/n) ")
-        if continueBuild == 'y':
+        if continueBuild.lower() == 'y':
             pkg.copyFromABS()
             pkg.buildPackage()
             if pkg.checkInstall() == True:
