@@ -126,23 +126,6 @@ class ArgumentParser:
 
         return
 
-def usage():
-    print("buildabs  -- builds packages from ABS")
-    print()
-    print("Usage:")
-    print("\t./buildabs.py [options] <package>")
-    print()
-    print("Options:")
-    print("\t-u, --update\t Update the ABS before building. Requires sudo.")
-    print("\t-e, --edit\t   Edit the PKGBUILD before building.")
-    print("\t-h, --help\t   Show this help message.")
-    print()
-    print("buildabs will copy the package directory from the ABS tree.")
-    print("into /tmp/<package>. It will install build/run dependencies")
-    print("and remove the build dependencies after install. It will then")
-    print("remove the build directory from /tmp on successful installation.")
-    sys.exit(1)
-
 if __name__ == "__main__":
     argp = ArgumentParser()
     argp.parse()
