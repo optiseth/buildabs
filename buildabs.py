@@ -121,8 +121,6 @@ class ArgumentParser:
                 updateABS = True
             if self.args[index].lower() == '-e' or self.args[index].lower() == '--edit':
                 editPKGBUILD = True
-            #if self.args[index].lower() == '-h' or self.args[index].lower() == '--help':
-            #    usage()
 
         return
 
