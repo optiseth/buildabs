@@ -8,9 +8,10 @@ import shutil
 package = None
 editPKGBUILD = False
 updateABS = False
+skipPGPCheck = False
 
 class buildABS:
-    def __init__(self, package, editPKGBUILD, updateABS):
+    def __init__(self, package, editPKGBUILD, updateABS, skipPGPCheck):
         self.package = package
         try:
             self.packagePath = bytes.decode(subprocess.check_output(["/usr/bin/find", "/var/abs/", "-name", self.package]).rstrip())
@@ -18,6 +19,7 @@ class buildABS:
             print("\nCan't find package in /var/abs/")
             print("Command: /usr/bin/find /var/abs/ -name " + self.package)
         self.editPKGBUILD = editPKGBUILD
+        self.skipPGPCheck = skipPGPCheck
         self.updateABS = updateABS
         self.repoVersion = self.repoInfo()
 
@@ -76,7 +78,10 @@ class buildABS:
         try:
             os.chdir("/tmp/" + self.package)
             print("\nBuilding the package now...\n")
-            subprocess.call(["/usr/bin/makepkg", "-rsi"])
+            if self.skipPGPCheck == True:
+                subprocess.call(["/usr/bin/makepkg", "-rsi", "--skippgpcheck"])
+            else:
+                subprocess.call(["/usr/bin/makepkg", "-rsi"])
         except:
             print("\nFile not found. Aborting!")
             print("Command: /usr/bin/makepkg -rsi")
@@ -113,6 +118,7 @@ class ArgumentParser:
         global package
         global editPKGBUILD
         global updateABS
+        global skipPGPCheck
         del self.args[0]
         package = self.args[len(self.args) - 1]
         del self.args[len(self.args) - 1]
@@ -121,6 +127,8 @@ class ArgumentParser:
                 updateABS = True
             if self.args[index].lower() == '-e' or self.args[index].lower() == '--edit':
                 editPKGBUILD = True
+            if self.args[index].lower() == '-s' or self.args[index].lower() == '--skippgpcheck':
+                skipPGPCheck = True
 
         return
 
@@ -128,7 +136,7 @@ if __name__ == "__main__":
     argp = ArgumentParser()
     argp.parse()
 
-    pkg = buildABS(package, editPKGBUILD, updateABS)
+    pkg = buildABS(package, editPKGBUILD, updateABS, skipPGPCheck)
     if pkg.updateABS == True:
         pkg.updateABSRepo()
     if pkg.repoInfo() == pkg.absVersion():
