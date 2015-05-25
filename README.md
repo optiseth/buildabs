@@ -9,6 +9,8 @@ Usage:
 
 Options:
 
-  -u  Update ABS before building
+  -u, --update  Update ABS before building
   
-  -e  Edit the PKGBUILD before building
+  -e, --edit  Edit the PKGBUILD before building
+
+  -s, --skippgpcheck  Skip PGP check before building
