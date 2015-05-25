@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
+from sys import argv, exit
 import os
 import subprocess
 import shutil
@@ -34,7 +34,7 @@ class buildABS:
             subprocess.call([os.getenv('EDITOR'), "/tmp/" + self.package + "/PKGBUILD"])
         except:
             print("\nFile not found")
-            print("Command:", os.getevn('EDITOR'), "/tmp/" + self.package + "/PKGBUILD")
+            print("Command:", os.getenv('EDITOR'), "/tmp/" + self.package + "/PKGBUILD")
 
     def repoInfo(self):
         try:
@@ -46,7 +46,7 @@ class buildABS:
         except:
             print("\nError processing command. Check package name or arguments passed.")
             print("Command: /usr/bin/pacman -Si " + self.package)
-            sys.exit(1)
+            exit(1)
 
     def absVersion(self):
         try:
@@ -61,7 +61,7 @@ class buildABS:
         except:
             print("Can't find PKGBUILD / grep.")
             print("Command: /usr/bin/grep pkgver= " + self.packagePath + "/PKGBUILD")
-            sys.exit(1)
+            exit(1)
 
     def copyFromABS(self):
         try:
@@ -70,7 +70,7 @@ class buildABS:
         except:
             print("\nError copying the file. I don't know what happened.")
             print("Command: /usr/bin/cp -r " + self.packagePath + " /tmp/")
-            sys.exit(1)
+            exit(1)
 
     def buildPackage(self):
         try:
@@ -80,7 +80,7 @@ class buildABS:
         except:
             print("\nFile not found. Aborting!")
             print("Command: /usr/bin/makepkg -rsi")
-            sys.exit(1)
+            exit(1)
 
     def removeBuildDir(self):
         try:
@@ -89,7 +89,7 @@ class buildABS:
         except:
             print("Attempt to remove package directory failed: /tmp/" + self.package)
             print("Might require elevated privileges. You'll have to remove it manually.")
-            sys.exit(1)
+            exit(1)
 
     def checkInstall(self):
         try:
@@ -101,13 +101,13 @@ class buildABS:
             else:
                 return False
         except:
-            print("\nPacman not found or bad package name.")
+            print("\nBad package name.")
             print("Command: /usr/bin/pacman -Qi", self.package)
-            sys.exit(1)
+            exit(1)
 
 class ArgumentParser:
     def __init__(self):
-        self.args = sys.argv
+        self.args = argv
 
     def parse(self):
         global package
@@ -140,7 +140,7 @@ if __name__ == "__main__":
             pkg.removeBuildDir()
         else:
             print(pkg.package, "failed to install. You can install manually.")
-            sys.exit
+            exit
     else:
         continueBuild = input("\nRepo version is newer than ABS version. Would you like to contine? (y/n) ")
         if continueBuild.lower() == 'y':
@@ -150,6 +150,6 @@ if __name__ == "__main__":
                 pkg.removeBuildDir()
             else:
                 print(pkg.package, "failed to install. You can install manually.")
-                sys.exit
+                exit
         else:
-            sys.exit
+            exit
